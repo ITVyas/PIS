@@ -1,0 +1,65 @@
+CREATE SCHEMA IF NOT EXISTS HotelDatabase
+CHARACTER SET "utf8mb4";  
+
+USE HotelDatabase;
+
+CREATE TABLE IF NOT EXISTS HotelRooms (
+number SMALLINT PRIMARY KEY AUTO_INCREMENT,
+type ENUM('Economy', 'Standard', 'Deluxe', 'Suite', 'Presidential') NOT NULL,
+rooms_amount SMALLINT NOT NULL,
+single_beds_amount SMALLINT NOT NULL,
+double_beds_amount SMALLINT NOT NULL,
+mini_bar BOOLEAN NOT NULL,
+tv BOOLEAN NOT NULL,
+dryer BOOLEAN NOT NULL,
+price FLOAT
+);
+
+CREATE TABLE IF NOT EXISTS Clients (
+id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL,
+surname VARCHAR(255) NOT NULL,
+phone VARCHAR(255) NOT NULL UNIQUE,
+email VARCHAR(255) NOT NULL UNIQUE
+);
+
+
+CREATE TABLE IF NOT EXISTS Administrators (
+id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL,
+surname VARCHAR(255) NOT NULL,
+phone VARCHAR(255) NOT NULL UNIQUE,
+email VARCHAR(255) NOT NULL UNIQUE,
+password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Requests (
+id INT PRIMARY KEY AUTO_INCREMENT,
+client_id INT NOT NULL,
+room_number SMALLINT NOT NULL,
+arrival_date DATE NOT NULL,
+departure_date DATE NOT NULL,
+paid BOOLEAN NOT NULL,
+status ENUM('In process', 'Processed', 'Refund') NOT NULL,
+CONSTRAINT fkClientIdReqToClients FOREIGN KEY (client_id) REFERENCES Clients (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE,
+CONSTRAINT fkRoomNumberReqToRooms FOREIGN KEY (room_number) REFERENCES HotelRooms (number)
+ON DELETE CASCADE 
+ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS RoomRegister (
+id INT PRIMARY KEY AUTO_INCREMENT,
+room_number SMALLINT NOT NULL,
+status ENUM('Booked', 'Occupied', 'Prepearing', 'Not available') NOT NULL,
+start_date_time TIMESTAMP NOT NULL,
+end_date_time TIMESTAMP NOT NULL,
+client_id INT,
+CONSTRAINT fkRoomNumberRegisterToRooms FOREIGN KEY (room_number)  REFERENCES HotelRooms (number)
+ON DELETE CASCADE 
+ON UPDATE CASCADE,
+CONSTRAINT fkClientIdRegisterToClients FOREIGN KEY (client_id) REFERENCES Clients (id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE
+);
